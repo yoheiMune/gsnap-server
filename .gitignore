@@ -1,4 +1,5 @@
 .idea
+.DS_Store
 .python-version
 .env
 __pycache__
