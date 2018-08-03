@@ -21,6 +21,15 @@ class User(AbstractModel, db.Model):
     api_token = db.Column(db.String(255))
     avatar_url = db.Column(db.String(255))
 
+    @classmethod
+    def by_id(cls, id):
+        return db.session.query(cls).filter_by(id=id).first()
+
+    @classmethod
+    def from_api_key(cls, api_token):
+        if not api_token:
+            return None
+        return db.session.query(cls).filter_by(api_token=api_token).first()
 
 
 class Post(AbstractModel, db.Model):
@@ -30,3 +39,7 @@ class Post(AbstractModel, db.Model):
     image_url = db.Column(db.String(255))
     body = db.Column(db.Text())
     posted_at = db.Column(db.DateTime, nullable=False)
+
+    @classmethod
+    def all(cls):
+        return db.session.query(cls)
