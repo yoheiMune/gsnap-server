@@ -14,7 +14,7 @@ class AbstractModel():
 
 class User(AbstractModel, db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     login_id = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -31,10 +31,16 @@ class User(AbstractModel, db.Model):
             return None
         return db.session.query(cls).filter_by(api_token=api_token).first()
 
+    @classmethod
+    def login(cls, login_id, password):
+        if not login_id or not password:
+            return None
+        return db.session.query(User).filter_by(login_id=login_id, password=password).first()
+
 
 class Post(AbstractModel, db.Model):
     __tablename__ = 'posts'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, primary_key=True)
     image_url = db.Column(db.String(255))
     body = db.Column(db.Text())

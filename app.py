@@ -1,12 +1,23 @@
+import os
+from datetime import datetime
 from flask import Flask, request, jsonify, make_response
 import models
-from util import CustomJSONEncoder
+from util import CustomJSONEncoder, str_random
 from models import db, User, Post
 
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
 app.config.from_pyfile('.env')
 models.init_db(app)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ['png', 'jpg', 'jpeg']
+
+
+def get_ext(filename):
+    return filename.rsplit('.', 1)[1].lower()
 
 
 @app.before_request
@@ -24,12 +35,9 @@ def before_filter():
 def login():
     login_id = request.form.get("login_id")
     password = request.form.get("password")
-    if not login_id or not password:
-        return make_response(jsonify(message="Authorization failed."), 400)
-    user = db.session.query(User).filter_by(login_id=login_id, password=password).first()
+    user = User.login(login_id, password)
     if not user:
         return make_response(jsonify(message="Authorization failed."), 400)
-    print(user)
     return jsonify(user.as_dict())
 
 
@@ -39,6 +47,30 @@ def get_posts():
     for p in posts:
         p["user"] = User.by_id(p["user_id"]).as_dict()
     return jsonify(posts)
+
+
+@app.route("/api/posts", methods=["POST"])
+def add_posts():
+    # バリデーション.
+    body = request.form.get("body")
+    file = request.files.get("file")
+    if not body or not file:
+        return make_response(jsonify(message="Some parameters are missing."), 400)
+    if not allowed_file(file.filename):
+        return make_response(jsonify(message="File type is not allowed."), 400)
+    # 画像を保存.
+    filename = "u_" + str_random() + "." + get_ext(file.filename)
+    file.save(os.path.join('./static/images/photos/', filename))
+    # 投稿を保存.
+    post = Post()
+    post.user_id = request.user.id
+    post.image_url = "/static/images/photos/" + filename
+    post.body = body
+    post.posted_at = datetime.now()
+    db.session.add(post)
+    db.session.commit()
+
+    return make_response(jsonify(post.as_dict()), 201)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
-from flask.json import JSONEncoder
 import calendar
 from datetime import datetime
+import string
+import random
+from flask.json import JSONEncoder
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -21,3 +23,7 @@ class CustomJSONEncoder(JSONEncoder):
         else:
             return list(iterable)
         return JSONEncoder.default(self, obj)
+
+
+def str_random(n=10):
+    return ''.join([random.choice(string.ascii_letters + string.digits) for _ in range(n)])

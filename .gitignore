@@ -4,3 +4,5 @@
 .env
 __pycache__
 
+# 投稿画像.
+static/images/photos/u_*
