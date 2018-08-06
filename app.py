@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, make_response
 import models
 from util import CustomJSONEncoder, str_random
 from models import db, User, Post
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
@@ -22,7 +23,7 @@ def get_ext(filename):
 
 @app.before_request
 def before_filter():
-    if request.path == "/api/login":
+    if request.path == "/api/login" or request.path.startswith("/static"):
         return None
     api_token = request.args.get('api_token')
     user = User.from_api_key(api_token)
@@ -33,8 +34,9 @@ def before_filter():
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    login_id = request.form.get("login_id")
-    password = request.form.get("password")
+    login_id = request.json.get("login_id")
+    password = request.json.get("password")
+    print("login:", login_id, password)
     user = User.login(login_id, password)
     if not user:
         return make_response(jsonify(message="Authorization failed."), 400)
@@ -43,7 +45,7 @@ def login():
 
 @app.route("/api/posts", methods=["GET"])
 def get_posts():
-    posts = [p.as_dict() for p in Post.all()]
+    posts = [p.as_dict() for p in Post.query.order_by(desc(Post.id)).all()]
     for p in posts:
         p["user"] = User.by_id(p["user_id"]).as_dict()
     return jsonify(posts)
@@ -74,4 +76,4 @@ def add_posts():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
