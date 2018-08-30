@@ -50,7 +50,7 @@ def get_posts():
         p["user"] = User.by_id(p["user_id"]).as_dict()
         like_users = PostLike.user_ids(p["id"])
         p["num_of_likes"] =  len(like_users)
-        p["liked"] = (p["user_id"] in like_users)
+        p["liked"] = (request.user.id in like_users)
         p["num_of_comments"] = len(PostComment.comments(p["id"]))
     return jsonify(posts)
 
@@ -105,7 +105,7 @@ def remove_like(post_id):
         return make_response(jsonify({"message": "Liked post not found."}), 400)
     db.session.delete(post_like)
     db.session.commit()
-    return make_response(jsonify({"message": "Deleted."}), 204)
+    return make_response(jsonify({"message": "Deleted."}), 200)
 
 
 @app.route("/api/posts/<path:post_id>/comments", methods=["GET"])
@@ -144,7 +144,7 @@ def remove_comment(comment_id):
         return make_response(jsonify({"message" : "Not Found."}), 404)
     db.session.delete(post_comment)
     db.session.commit()
-    return make_response(jsonify({"message": "Deleted."}), 204)
+    return make_response(jsonify({"message": "Deleted."}), 200)
 
 
 if __name__ == "__main__":
