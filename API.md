@@ -3,7 +3,7 @@
 
 ## 共通
 * APIルート：http://gsnap.yoheim.tech
-* 実装ファイル：[app.py](./appy.py)
+* 実装ファイル：[app.py](./app.py)
   * 本仕様書で不明点がある場合には、お手数ですが上記の実装内容をご確認ください.
 * リクエストヘッダ：
   * Content-Type : application/json
