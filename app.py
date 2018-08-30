@@ -119,7 +119,7 @@ def get_comment(post_id):
 @app.route("/api/posts/<path:post_id>/comments", methods=["POST"])
 def add_comment(post_id):
     # バリデーション.
-    comment = request.form.get("comment")
+    comment = request.json.get("comment")
     if not comment:
         return make_response(jsonify({"message": "comment must be set."}), 400)
     post = Post.by_id(post_id)
