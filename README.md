@@ -25,8 +25,8 @@ GRANT ALL PRIVILEGES ON gsnap.* TO 'gsnap'@'localhost';
 ### テーブル作成
 ```
 $ FLASK_APP=app.py flask shell
->>> from models import db
->>> db.create_all()
+from models import db
+db.create_all()
 ```
 ### データ投入
 `sql/database/seeds.sql`を投入.
