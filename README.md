@@ -1,6 +1,10 @@
 # gsnap-server
 GSnapのサーバーサイドです。
 
+## API仕様書
+[こちら](./API.md) をご参照ください.
+
+
 ## Pythonのセットアップ
 ### Python3系のインストール
 https://www.python.org/
